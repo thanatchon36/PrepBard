@@ -84,7 +84,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                 st.session_state.progress_percent = round((completed_no * 100) / total_no, 4)
 
                 progress_text = f"Operation in progress. Please wait. {st.session_state.progress_percent}% ({st.session_state.completed_no}/{st.session_state.total_no})"
-                my_bar = st.progress(st.session_state.progress_percent, text=progress_text)
+                my_bar.progress(st.session_state.progress_percent, text=progress_text)
                 
             except:
                 fil_df = pd.DataFrame()
