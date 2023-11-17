@@ -45,6 +45,9 @@ for message in st.session_state.messages:
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
+full_df['context_len'] = full_df['context'].apply(lambda x: len(str(x)))
+full_df = reset(full_df[full_df['context_len'] >= 1200])
+
 total_no = len(full_df)
 
 csv_file = "data/bard.csv"
