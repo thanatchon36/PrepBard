@@ -62,6 +62,7 @@ if "progress_percent" not in st.session_state:
     st.session_state.progress_percent = 0
     st.session_state.completed_no = 0
     st.session_state.total_no = total_no
+    st.session_state.error_no = 0
     
 progress_text = f"Operation in progress. Please wait. {st.session_state.progress_percent}% ({st.session_state.completed_no}/{st.session_state.total_no})"
 my_bar = st.progress(st.session_state.progress_percent, text=progress_text)
@@ -72,7 +73,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
     bard = Bard(token=token)
     
     try:
-        error_no = 0
+        st.session_state.error_no = 0
         with st.spinner('Requesting...'):
             while True:
                 try:
@@ -113,25 +114,25 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         """
                     output = bard.get_answer(prompt)['content']
                     
-                    if error_no >= 20:
+                    if st.session_state.error_no >= 20:
                         temp_msg = 'Due to Errors, Stopped !'
 
                     elif 'Error' in output:
                         temp_msg = "Error ! " + str(Doc_Page_ID)
-                        error_no = error_no + 1
+                        st.session_state.error_no = st.session_state.error_no + 1
                     
                     else:
                         writer = csv.writer(file)
                         writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
                         temp_msg = "Record Saved ! " + str(Doc_Page_ID)
-                        error_no = 0
+                        st.session_state.error_no = 0
 
                     with st.chat_message("assistant"):
                         message_placeholder = st.empty() 
                         message_placeholder.markdown(temp_msg)
                         st.session_state.messages.append({"content": temp_msg})
 
-                    if error_no >= 20:
+                    if st.session_state.error_no >= 20:
                         break
 
                     mu, sigma = 1, 0.1 # mean and standard deviation
