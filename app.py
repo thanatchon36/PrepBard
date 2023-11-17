@@ -110,7 +110,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         """
                     output = bard.get_answer(prompt)['content']
                     
-                    if error_no == 10:
+                    if error_no >= 20:
                         temp_msg = 'Due to Errors, Stopped !'
 
                     elif 'Error' in output:
@@ -128,7 +128,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         message_placeholder.markdown(temp_msg)
                         st.session_state.messages.append({"content": temp_msg})
 
-                    if error_no == 20:
+                    if error_no >= 20:
                         break
 
                     mu, sigma = 1, 0.1 # mean and standard deviation
