@@ -2,14 +2,14 @@ import streamlit as st
 from bardapi import Bard
 import pandas as pd
 import ast
-import requests
 import json
 import re
 import os
 import csv
-from tqdm import tqdm
 import datetime
 import time
+import random
+import numpy as np
 
 def get_now():
     now = datetime.datetime.now()
@@ -128,9 +128,12 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         message_placeholder.markdown(temp_msg)
                         st.session_state.messages.append({"content": temp_msg})
 
-                    if error_no == 10:
+                    if error_no == 20:
                         break
-                    time.sleep(4)
+
+                    mu, sigma = 1, 0.1 # mean and standard deviation
+                    s = np.random.normal(mu, sigma, 1000)
+                    time.sleep(random.choice(s))
     except:
         pass
 
