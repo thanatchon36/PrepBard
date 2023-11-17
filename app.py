@@ -87,7 +87,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                     st.session_state.completed_no = completed_no
                     st.session_state.progress_percent = round(completed_no / total_no, 4)
 
-                    progress_text = f"Operation in progress. Please wait. {st.session_state.progress_percent*100}% ({st.session_state.completed_no}/{st.session_state.total_no})"
+                    progress_text = f"Operation in progress. Please wait. {round(st.session_state.progress_percent*100, 4)}% ({st.session_state.completed_no}/{st.session_state.total_no})"
                     my_bar.progress(st.session_state.progress_percent, text=progress_text)
                     
                 except:
