@@ -121,6 +121,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         writer = csv.writer(file)
                         writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
                         temp_msg = "Record Saved ! " + str(Doc_Page_ID)
+                        error_no = 0
 
                     with st.chat_message("assistant"):
                         message_placeholder = st.empty() 
