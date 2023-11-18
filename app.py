@@ -40,8 +40,12 @@ if "messages" not in st.session_state:
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
-    with st.chat_message("assistant"):
-        st.markdown(message["content"])
+    if message["role"] == "assistant":
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    else:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
@@ -71,6 +75,11 @@ my_bar = st.progress(st.session_state.progress_percent, text=progress_text)
 if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
     token = prompt
     bard = Bard(token=token)
+
+    # Display user input in the chat
+    st.chat_message("user").write(token)
+    # Add user message to the chat history
+    st.session_state.messages.append({"role": "user", "content": token})
     
     try:
         st.session_state.error_no = 0
@@ -127,10 +136,10 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                         st.session_state.error_no = 0
 
-                    with st.chat_message("assistant"):
-                        message_placeholder = st.empty() 
-                        message_placeholder.markdown(temp_msg)
-                        st.session_state.messages.append({"content": temp_msg})
+                        # Display user input in the chat
+                        st.chat_message("assistant").write(temp_msg)
+                        # Add user message to the chat history
+                        st.session_state.messages.append({"role": "assistant", "content": temp_msg})
 
                     if st.session_state.error_no >= 20:
                         break
@@ -140,4 +149,3 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                     time.sleep(random.choice(s))
     except:
         pass
-
