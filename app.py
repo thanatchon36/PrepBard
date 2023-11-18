@@ -92,8 +92,6 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
 
                     completed_no = len(list(set(fil_id_list)))
 
-                    print(completed_no)
-
                     st.session_state.completed_no = completed_no
                     st.session_state.progress_percent = round(completed_no / total_no, 4)
 
