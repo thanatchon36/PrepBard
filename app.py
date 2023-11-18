@@ -121,13 +121,9 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         """
                     output = bard.get_answer(prompt)['content']
                     
-                    if st.session_state.error_no >= 20:
-                        temp_msg = 'Due to Errors, Stopped !'
-
-                    elif 'Error' in output:
+                    if 'Error' in output:
                         temp_msg = "Error ! " + str(Doc_Page_ID)
                         st.session_state.error_no = st.session_state.error_no + 1
-                    
                     else:
                         writer = csv.writer(file)
                         writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
@@ -139,8 +135,10 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         # Add user message to the chat history
                         st.session_state.messages.append({"role": "assistant", "content": temp_msg})
 
-                    # if st.session_state.error_no >= 20:
-                    #     break
+                    if st.session_state.error_no >= 40:
+                        temp_msg = 'Due to Errors, Stopped !'
+                        st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                        break
 
                     mu, sigma = 1, 0.1 # mean and standard deviation
                     s = np.random.normal(mu, sigma, 1000)
