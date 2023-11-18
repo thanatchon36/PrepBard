@@ -37,15 +37,15 @@ st.markdown("""
 # Initialize chat history if it doesn't exist
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    if message["role"] == "assistant":
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-    else:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+else:
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        if message["role"] == "assistant":
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        else:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
