@@ -123,15 +123,14 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         if 'Error' in output:
                             temp_msg = "Error ! " + str(Doc_Page_ID)
                             st.session_state.error_no = st.session_state.error_no + 1
+                            st.chat_message("assistant").write(temp_msg)
+                            st.session_state.messages.append({"role": "assistant", "content": temp_msg})
                         else:
                             writer = csv.writer(file)
                             writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
-
-                            # Display user input in the chat
                             st.chat_message("assistant").write(temp_msg)
-                            # Add user message to the chat history
                             st.session_state.messages.append({"role": "assistant", "content": temp_msg})
 
                         mu, sigma = 1, 0.1 # mean and standard deviation
