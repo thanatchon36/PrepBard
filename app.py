@@ -85,8 +85,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
         st.session_state.error_no = 0
         with st.spinner('Requesting...'):
             while True:
-                try:
-
+                try:        
                     fil_df = pd.read_csv('data/bard.csv', dtype = str, usecols = ['Doc_Page_ID'])
                     fil_id_list = list(fil_df['Doc_Page_ID'].values)
 
@@ -102,46 +101,53 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                     fil_df = pd.DataFrame()
                     fil_id_list = []
                     pass
-
+                
                 sample_df = full_df.copy()
                 sample_df = reset(sample_df[~sample_df['Doc_Page_ID'].isin(fil_id_list)])
 
                 csv_file = "data/bard.csv"
                 with open(csv_file, mode='a', newline='') as file:
+                    try:
+                        sample_instance = sample_df.sample(1)
+                        prompt = sample_instance['context'].values[0]
+                        Doc_Page_ID = sample_instance['Doc_Page_ID'].values[0]
 
-                    sample_instance = sample_df.sample(1)
-                    prompt = sample_instance['context'].values[0]
-                    Doc_Page_ID = sample_instance['Doc_Page_ID'].values[0]
+                        prompt = f"""คุณเป็นอาจารย์มหาวิทยาลัย คุณต้องการสร้างคำถามและคำตอบเพื่อออกข้อสอบ จำนวน5ถึง20คำถาม คุณจะถามคำถามจากข้อเท็จจริงใน #เนื้อหา เท่านั้น ห้ามนำข้อมูลที่ไม่อยู่ใน #เนื้อหา มาเป็นคำถาม คำถามที่คุณสร้างจะแสดงผลในตาราง
+                        โดยเนื้อหาที่คุณต้องการจะออกข้อสอบคือ
+                        
+                        #เนื้อหา
+                        {prompt}
+                            """
+                        output = bard.get_answer(prompt)['content']
+                        
+                        if 'Error' in output:
+                            temp_msg = "Error ! " + str(Doc_Page_ID)
+                            st.session_state.error_no = st.session_state.error_no + 1
+                        else:
+                            writer = csv.writer(file)
+                            writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
+                            temp_msg = "Record Saved ! " + str(Doc_Page_ID)
+                            st.session_state.error_no = 0
 
-                    prompt = f"""คุณเป็นอาจารย์มหาวิทยาลัย คุณต้องการสร้างคำถามและคำตอบเพื่อออกข้อสอบ จำนวน5ถึง20คำถาม คุณจะถามคำถามจากข้อเท็จจริงใน #เนื้อหา เท่านั้น ห้ามนำข้อมูลที่ไม่อยู่ใน #เนื้อหา มาเป็นคำถาม คำถามที่คุณสร้างจะแสดงผลในตาราง
-                    โดยเนื้อหาที่คุณต้องการจะออกข้อสอบคือ
-                    
-                    #เนื้อหา
-                    {prompt}
-                        """
-                    output = bard.get_answer(prompt)['content']
-                    
-                    if 'Error' in output:
+                            # Display user input in the chat
+                            st.chat_message("assistant").write(temp_msg)
+                            # Add user message to the chat history
+                            st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+
+                        mu, sigma = 1, 0.1 # mean and standard deviation
+                        s = np.random.normal(mu, sigma, 1000)
+                        time.sleep(random.choice(s))
+                    except:
                         temp_msg = "Error ! " + str(Doc_Page_ID)
                         st.session_state.error_no = st.session_state.error_no + 1
-                    else:
-                        writer = csv.writer(file)
-                        writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
-                        temp_msg = "Record Saved ! " + str(Doc_Page_ID)
-                        st.session_state.error_no = 0
-
-                        # Display user input in the chat
                         st.chat_message("assistant").write(temp_msg)
-                        # Add user message to the chat history
                         st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                        pass
 
-                    if st.session_state.error_no >= 40:
+                    if st.session_state.error_no >= 20:
                         temp_msg = 'Due to Errors, Stopped !'
+                        st.chat_message("assistant").write(temp_msg)
                         st.session_state.messages.append({"role": "assistant", "content": temp_msg})
                         break
-
-                    mu, sigma = 1, 0.1 # mean and standard deviation
-                    s = np.random.normal(mu, sigma, 1000)
-                    time.sleep(random.choice(s))
     except:
         pass
