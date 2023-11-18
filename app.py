@@ -139,8 +139,8 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         # Add user message to the chat history
                         st.session_state.messages.append({"role": "assistant", "content": temp_msg})
 
-                    if st.session_state.error_no >= 20:
-                        break
+                    # if st.session_state.error_no >= 20:
+                    #     break
 
                     mu, sigma = 1, 0.1 # mean and standard deviation
                     s = np.random.normal(mu, sigma, 1000)
