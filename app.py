@@ -131,7 +131,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                             writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
-                            st.chat_message("assistant").write(temp_msg)
+                            st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
                             st.session_state.messages.append({"role": "assistant", "content": temp_msg, "timestamp": timestamp})
 
                         mu, sigma = 1, 0.1 # mean and standard deviation
