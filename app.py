@@ -1,3 +1,4 @@
+from sqlite3 import Timestamp
 import streamlit as st
 from bardapi import Bard
 import pandas as pd
@@ -40,12 +41,9 @@ if "messages" not in st.session_state:
 else:
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
-        if message["role"] == "assistant":
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-        else:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"] + ' ' + message["timestamp"])
+
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
@@ -76,10 +74,11 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
     token = prompt
     bard = Bard(token=token)
 
+    timestamp = get_now()
     # Display user input in the chat
     st.chat_message("user").write(token)
     # Add user message to the chat history
-    st.session_state.messages.append({"role": "user", "content": token})
+    st.session_state.messages.append({"role": "user", "content": token, "timestamp": timestamp})
     
     try:
         st.session_state.error_no = 0
@@ -122,31 +121,35 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         
                         if 'Error' in output:
                             temp_msg = "Error ! " + str(Doc_Page_ID)
+                            timestamp = get_now()
                             st.session_state.error_no = st.session_state.error_no + 1
-                            st.chat_message("assistant").write(temp_msg)
-                            st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                            st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
+                            st.session_state.messages.append({"role": "assistant", "content": temp_msg, "timestamp": timestamp})
                         else:
                             writer = csv.writer(file)
-                            writer.writerow([get_now(), sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
+                            timestamp = get_now()
+                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
                             st.chat_message("assistant").write(temp_msg)
-                            st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                            st.session_state.messages.append({"role": "assistant", "content": temp_msg, "timestamp": timestamp})
 
                         mu, sigma = 1, 0.1 # mean and standard deviation
                         s = np.random.normal(mu, sigma, 1000)
                         time.sleep(random.choice(s))
                     except:
                         temp_msg = "Error ! " + str(Doc_Page_ID)
+                        timestamp = get_now()
                         st.session_state.error_no = st.session_state.error_no + 1
-                        st.chat_message("assistant").write(temp_msg)
-                        st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                        st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
+                        st.session_state.messages.append({"role": "assistant", "content": temp_msg, "timestamp": timestamp})
                         pass
 
                     if st.session_state.error_no >= 20:
                         temp_msg = 'Due to Errors, Stopped !'
-                        st.chat_message("assistant").write(temp_msg)
-                        st.session_state.messages.append({"role": "assistant", "content": temp_msg})
+                        timestamp = get_now()
+                        st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
+                        st.session_state.messages.append({"role": "assistant", "content": temp_msg, "timestamp": timestamp})
                         break
     except:
         pass
