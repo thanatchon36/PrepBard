@@ -76,7 +76,7 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
 
     timestamp = get_now()
     # Display user input in the chat
-    st.chat_message("user").write(token)
+    st.chat_message("user").write(token + ' ' + timestamp)
     # Add user message to the chat history
     st.session_state.messages.append({"role": "user", "content": token, "timestamp": timestamp})
     
