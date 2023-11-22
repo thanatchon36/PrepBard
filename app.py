@@ -117,9 +117,13 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         #เนื้อหา
                         {prompt}
                             """
-                        output = bard.get_answer(prompt)['content']
+                        output = bard.get_answer(prompt)
+                        output_0 = output['content']
+                        output_1 = output['choices'][0]['content'][0]
+                        output_2 = output['choices'][1]['content'][0]
+                        output_3 = output['choices'][2]['content'][0]
                         
-                        if 'Error' in output:
+                        if 'Error' in output_0:
                             temp_msg = "Error ! " + str(Doc_Page_ID)
                             timestamp = get_now()
                             st.session_state.error_no = st.session_state.error_no + 1
@@ -128,7 +132,9 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         else:
                             writer = csv.writer(file)
                             timestamp = get_now()
-                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output, Doc_Page_ID])
+                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_1, Doc_Page_ID])
+                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_2, Doc_Page_ID])
+                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_3, Doc_Page_ID])
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
                             st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
