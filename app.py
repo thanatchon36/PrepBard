@@ -48,7 +48,7 @@ else:
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
 full_df['context_len'] = full_df['context'].apply(lambda x: len(str(x)))
-full_df = reset(full_df[full_df['context_len'] >= 1200])
+full_df = reset(full_df[full_df['context_len'] >= 800])
 
 total_no = len(full_df)
 
