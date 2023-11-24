@@ -48,12 +48,13 @@ else:
 cols = ['Doc_ID','Page_ID','file_name','context','Doc_Page_ID']
 key_id = 'Doc_Page_ID'
 context_col_name = "context"
+min_context_len = 800
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
 
 full_df['context_len'] = full_df[context_col_name].apply(lambda x: len(str(x)))
-full_df = reset(full_df[full_df['context_len'] >= 800])
+full_df = reset(full_df[full_df['context_len'] >= min_context_len])
 full_df.drop(columns = 'context_len', inplace = True)
 total_no = len(full_df)
 
