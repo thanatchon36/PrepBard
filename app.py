@@ -44,11 +44,17 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"] + ' ' + message["timestamp"])
 
+# Metadata Setup
+cols = ['Doc_ID','Page_ID','file_name','context','Doc_Page_ID']
+key_id = 'Doc_Page_ID'
+context_col_name = "context"
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
-full_df = reset(full_df[full_df['text_len'] >= 800])
 
+full_df['context_len'] = full_df[context_col_name].apply(lambda x: len(str(x)))
+full_df = reset(full_df[full_df['context_len'] >= 800])
+full_df.drop(columns = 'context_len', inplace = True)
 total_no = len(full_df)
 
 csv_file = "data/bard.csv"
@@ -56,7 +62,7 @@ file_exists = os.path.isfile(csv_file)
 if not file_exists:
     with open(csv_file, mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Timestamp','file_name','page_no','text','generative_text'])
+        writer.writerow(['Timestamp'] + cols + ['generative_text'])
         print(f'Create {csv_file}')
 
 if "progress_percent" not in st.session_state:
@@ -84,8 +90,8 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
         with st.spinner('Requesting...'):
             while True:
                 try:        
-                    fil_df = pd.read_csv('data/bard.csv', dtype = str, usecols = ['Doc_Page_ID'])
-                    fil_id_list = list(fil_df['Doc_Page_ID'].values)
+                    fil_df = pd.read_csv('data/bard.csv', dtype = str, usecols = [key_id])
+                    fil_id_list = list(fil_df[key_id].values)
 
                     completed_no = len(list(set(fil_id_list)))
 
@@ -101,14 +107,14 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                     pass
                 
                 sample_df = full_df.copy()
-                sample_df = reset(sample_df[~sample_df['Doc_Page_ID'].isin(fil_id_list)])
+                sample_df = reset(sample_df[~sample_df[key_id].isin(fil_id_list)])
 
                 csv_file = "data/bard.csv"
                 with open(csv_file, mode='a', newline='') as file:
                     try:
                         sample_instance = sample_df.sample(1)
-                        prompt = sample_instance['context'].values[0]
-                        Doc_Page_ID = sample_instance['Doc_Page_ID'].values[0]
+                        prompt = sample_instance[context_col_name].values[0]
+                        Doc_Page_ID = sample_instance[key_id].values[0]
 
                         prompt = f"""คุณเป็นอาจารย์มหาวิทยาลัย คุณต้องการสร้างคำถามและคำตอบเพื่อออกข้อสอบ จำนวน5ถึง20คำถาม คุณจะถามคำถามจากข้อเท็จจริงใน #เนื้อหา เท่านั้น ห้ามนำข้อมูลที่ไม่อยู่ใน #เนื้อหา มาเป็นคำถาม คำถามที่คุณสร้างจะแสดงผลในตาราง
                         โดยเนื้อหาที่คุณต้องการจะออกข้อสอบคือ
@@ -131,9 +137,10 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         else:
                             writer = csv.writer(file)
                             timestamp = get_now()
-                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_1])
-                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_2])
-                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_3])
+
+                            for each_output in [output_1, output_2, output_3]:
+                                writer.writerow([timestamp] + list(sample_instance.values[0]) + [each_output])
+
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
                             st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
