@@ -47,8 +47,7 @@ else:
 
 csv_file = 'data/data.csv'
 full_df = pd.read_csv(csv_file, dtype = str)
-full_df['context_len'] = full_df['context'].apply(lambda x: len(str(x)))
-full_df = reset(full_df[full_df['context_len'] >= 800])
+full_df = reset(full_df[full_df['text_len'] >= 800])
 
 total_no = len(full_df)
 
@@ -57,7 +56,7 @@ file_exists = os.path.isfile(csv_file)
 if not file_exists:
     with open(csv_file, mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Timestamp','Doc_ID','Page_ID','file_name','context','generative_text','Doc_Page_ID'])
+        writer.writerow(['Timestamp','file_name','page_no','text','generative_text'])
         print(f'Create {csv_file}')
 
 if "progress_percent" not in st.session_state:
@@ -132,9 +131,9 @@ if prompt := st.chat_input(placeholder="Kindly input your cookie..."):
                         else:
                             writer = csv.writer(file)
                             timestamp = get_now()
-                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_1, Doc_Page_ID])
-                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_2, Doc_Page_ID])
-                            writer.writerow([timestamp, sample_instance['Doc_ID'].values[0], sample_instance['Page_ID'].values[0], sample_instance['file_name'].values[0], sample_instance['context'].values[0], output_3, Doc_Page_ID])
+                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_1])
+                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_2])
+                            writer.writerow([timestamp, sample_instance['file_name'].values[0], sample_instance['page_no'].values[0], sample_instance['text'].values[0], output_3])
                             temp_msg = "Record Saved ! " + str(Doc_Page_ID)
                             st.session_state.error_no = 0
                             st.chat_message("assistant").write(temp_msg + ' ' + timestamp)
